@@ -15,6 +15,10 @@ DirectMessage: Represents private messages between users.
 Notification: Represents notifications for various activities.
 Hashtag: Represents hashtags used in tweets.
 TweetHashtag: Represents the many-to-many relationship between tweets and hashtags.
+
+## ERD Diagram
+
+```plaintext
 +-----------------+     +------------------+     +------------------+
 |     User        |     |       Tweet      |     |     Hashtag      |
 +-----------------+     +------------------+     +------------------+
