@@ -1,0 +1,125 @@
+# Twitter Data Model Project
+
+## Overview
+
+This project provides a comprehensive Entity-Relationship Diagram (ERD) for Twitter, breaking down the platform into its core components, analyzing how each part works, and understanding how they contribute to the overall functionality and user experience.
+
+## Entities and Attributes
+
+### User
+- **UserID (Primary Key)**: Unique identifier for each user.
+- **Username**: User's display name.
+- **Password**: User's password (should be securely hashed).
+- **Email**: User's email address.
+- **Name**: User's full name.
+- **Bio**: User's biography or description.
+- **ProfilePicture**: URL to the user's profile picture.
+- **HeaderImage**: URL to the user's header image.
+- **CreatedAt**: Timestamp of when the user account was created.
+
+### Tweet
+- **TweetID (Primary Key)**: Unique identifier for each tweet.
+- **UserID (Foreign Key)**: Identifier of the user who posted the tweet.
+- **Content**: Text content of the tweet.
+- **CreatedAt**: Timestamp of when the tweet was posted.
+- **InReplyToTweetID (Foreign Key to TweetID, nullable)**: Identifier of the tweet being replied to, if any.
+
+### Follow
+- **FollowerID (Foreign Key to UserID)**: Identifier of the user following another user.
+- **FolloweeID (Foreign Key to UserID)**: Identifier of the user being followed.
+- **FollowedAt**: Timestamp of when the follow action occurred.
+
+### Like
+- **LikeID (Primary Key)**: Unique identifier for each like.
+- **UserID (Foreign Key)**: Identifier of the user who liked the tweet.
+- **TweetID (Foreign Key)**: Identifier of the tweet being liked.
+- **LikedAt**: Timestamp of when the like action occurred.
+
+### Retweet
+- **RetweetID (Primary Key)**: Unique identifier for each retweet.
+- **UserID (Foreign Key)**: Identifier of the user who retweeted.
+- **TweetID (Foreign Key)**: Identifier of the tweet being retweeted.
+- **RetweetedAt**: Timestamp of when the retweet action occurred.
+
+### DirectMessage
+- **DMID (Primary Key)**: Unique identifier for each direct message.
+- **SenderID (Foreign Key to UserID)**: Identifier of the user sending the message.
+- **ReceiverID (Foreign Key to UserID)**: Identifier of the user receiving the message.
+- **Content**: Text content of the message.
+- **SentAt**: Timestamp of when the message was sent.
+
+### Notification
+- **NotificationID (Primary Key)**: Unique identifier for each notification.
+- **UserID (Foreign Key)**: Identifier of the user receiving the notification.
+- **Type**: Type of notification (e.g., like, retweet, mention, follow).
+- **RelatedEntityID**: Identifier of the related entity (like TweetID or UserID).
+- **CreatedAt**: Timestamp of when the notification was created.
+
+### Hashtag
+- **HashtagID (Primary Key)**: Unique identifier for each hashtag.
+- **Tag (Unique)**: The hashtag text.
+
+### TweetHashtag
+- **TweetID (Foreign Key to TweetID)**: Identifier of the tweet.
+- **HashtagID (Foreign Key to HashtagID)**: Identifier of the hashtag.
+
+## Relationships
+
+- A **User** can post many **Tweets** (1:N).
+- A **User** can follow many **Users** and be followed by many **Users** (N:M, implemented with the **Follow** entity).
+- A **User** can like many **Tweets** and a **Tweet** can be liked by many **Users** (N:M, implemented with the **Like** entity).
+- A **User** can retweet many **Tweets** and a **Tweet** can be retweeted by many **Users** (N:M, implemented with the **Retweet** entity).
+- A **User** can send many **DirectMessages** and receive many **DirectMessages** (1:N for both sender and receiver).
+- A **Tweet** can have many **Hashtags** and a **Hashtag** can be associated with many **Tweets** (N:M, implemented with the **TweetHashtag** entity).
+
+## ERD Diagram
+
+```plaintext
++-----------------+     +------------------+     +------------------+
+|     User        |     |       Tweet      |     |     Hashtag      |
++-----------------+     +------------------+     +------------------+
+| UserID (PK)     | 1   | TweetID (PK)     | N   | HashtagID (PK)   |
+| Username        |-----| UserID (FK)      |-----| Tag (Unique)     |
+| Password        |     | Content          |     +------------------+
+| Email           |     | CreatedAt        |
+| Name            |     | InReplyToTweetID (FK)  +------------------+
+| Bio             |     +------------------+     |  TweetHashtag    |
+| ProfilePicture  |                               +------------------+
+| HeaderImage     |                               | TweetID (FK)     |
+| CreatedAt       |                               | HashtagID (FK)   |
++-----------------+                               +------------------+
+         | 1:N                                        |     |
+         |                                             |     |
+         v N                                           v N   v N
++-----------------+     +------------------+     +------------------+
+|     Follow      |     |      Like        |     |    Retweet       |
++-----------------+     +------------------+     +------------------+
+| FollowerID (FK) |     | LikeID (PK)      |     | RetweetID (PK)   |
+| FolloweeID (FK) |-----| UserID (FK)      |-----| UserID (FK)      |
+| FollowedAt      |     | TweetID (FK)     |     | TweetID (FK)     |
++-----------------+     | LikedAt          |     | RetweetedAt      |
+                        +------------------+     +------------------+
+
+         | 1:N
+         v
++-----------------+
+| DirectMessage   |
++-----------------+
+| DMID (PK)       |
+| SenderID (FK)   |
+| ReceiverID (FK) |
+| Content         |
+| SentAt          |
++-----------------+
+
+         | 1:N
+         v
++-----------------+
+|  Notification   |
++-----------------+
+| NotificationID  |
+| UserID (FK)     |
+| Type            |
+| RelatedEntityID |
+| CreatedAt       |
++-----------------+
